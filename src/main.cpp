@@ -25,15 +25,18 @@ OV7670 camera(
   PIN_D0, PIN_D1, PIN_D2, PIN_D3, PIN_D4, PIN_D5, PIN_D6, PIN_D7
 );
 
-void setup() {
-  Serial.begin(115200);
+void setup() 
+{
+  Serial.begin(921600);  //115200);
   delay(1000);
-  
+
+  /*
   if (!ClockEnable(PIN_XCLK, 10000000)) {  // 10 MHz
     Serial.println("Erreur XCLK !");
   } else {
     Serial.println("XCLK OK !");
   }
+  */
 
   Serial.println("Initialisation de la caméra...");
 
@@ -49,16 +52,24 @@ void setup() {
   Serial.println("Caméra prête !");
 }
 
-void loop() {
+void loop(){
   Serial.println("Capture image...");
 
-  // Capture une seule frame
+  // Capture une seule frame == Image complète
   camera.oneFrame();
 
   // Récupérer les données dans I2SCamera::frame
   uint8_t* frame = I2SCamera::frame;
   size_t len = I2SCamera::frameBytes;
 
+  // Envoie en binaire direct à l'ordinateur
+  Serial.println("FRAME_START");
+  Serial.write(frame, len);
+  Serial.println("FRAME_END");
+  
+  delay(10);
+
+/*
   Serial.printf("Frame capturée (%d octets)\n", len);
 
   // Exemple : afficher les 16 premiers octets
@@ -68,4 +79,5 @@ void loop() {
   Serial.println();
 
   delay(1000);
+*/
 }
