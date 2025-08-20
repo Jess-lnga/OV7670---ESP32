@@ -28,6 +28,12 @@ OV7670 camera(
 void setup() {
   Serial.begin(115200);
   delay(1000);
+  
+  if (!ClockEnable(PIN_XCLK, 10000000)) {  // 10 MHz
+    Serial.println("Erreur XCLK !");
+  } else {
+    Serial.println("XCLK OK !");
+  }
 
   Serial.println("Initialisation de la caméra...");
 
