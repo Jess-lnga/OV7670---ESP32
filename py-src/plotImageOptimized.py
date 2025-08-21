@@ -70,14 +70,33 @@ btn.on_clicked(toggle)
 try:
     while plt.fignum_exists(fig.number):
         with lock:
-            if len(frame_data) == WIDTH*HEIGHT*2:  # RGB565
-                pixels = np.frombuffer(frame_data, dtype=np.uint16).reshape((HEIGHT, WIDTH))
+            if len(frame_data) > 0:
+                # On prend les données reçues
+                data = frame_data[:WIDTH*HEIGHT*2]  
+
+                # Si la taille est trop petite, on complète avec des zéros (pixels noirs)
+                if len(data) < WIDTH*HEIGHT*2:
+                    data = data + bytes(WIDTH*HEIGHT*2 - len(data))
+
+                # Conversion en pixels RGB565
+                pixels = np.frombuffer(data, dtype=np.uint16).reshape((HEIGHT, WIDTH))
                 r = ((pixels >> 11) & 0x1F) << 3
                 g = ((pixels >> 5) & 0x3F) << 2
                 b = (pixels & 0x1F) << 3
                 rgb = np.dstack((r, g, b)).astype(np.uint8)
+
                 img_display.set_data(rgb)
                 frame_data = bytearray()
+        
+        #with lock:
+            #if len(frame_data) == WIDTH*HEIGHT*2:  # RGB565
+                #pixels = np.frombuffer(frame_data, dtype=np.uint16).reshape((HEIGHT, WIDTH))
+                #r = ((pixels >> 11) & 0x1F) << 3
+                #g = ((pixels >> 5) & 0x3F) << 2
+                #b = (pixels & 0x1F) << 3
+                #rgb = np.dstack((r, g, b)).astype(np.uint8)
+                #img_display.set_data(rgb)
+                #frame_data = bytearray()
         plt.pause(0.01)
 finally:
     running = False
