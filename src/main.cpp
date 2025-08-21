@@ -25,9 +25,12 @@ OV7670 camera(
   PIN_D0, PIN_D1, PIN_D2, PIN_D3, PIN_D4, PIN_D5, PIN_D6, PIN_D7
 );
 
+const uint8_t FRAME_HEADER[4] = {0xAA, 0xBB, 0xCC, 0xDD};
+const uint8_t FRAME_FOOTER[4] = {0xDD, 0xCC, 0xBB, 0xAA};
+
 void setup() 
 {
-  Serial.begin(921600);  // 115200);
+  Serial.begin(921600);  //    115200);
   delay(1000);
 
   Serial.println("Initialisation de la caméra...");
@@ -50,7 +53,7 @@ void loop(){
   //unsigned long t0 = millis();
   // Capture une seule frame == Image complète
   camera.oneFrame();
-
+  
   // Récupérer les données dans I2SCamera::frame
   uint8_t* frame = I2SCamera::frame;
   size_t len = I2SCamera::frameBytes;
@@ -58,10 +61,16 @@ void loop(){
   //unsigned long t1 = millis();
   //Serial.printf("Capture time: %lu ms\n", t1 - t0);
 
+  
+
   // Envoie en binaire direct à l'ordinateur
-  Serial.println("FRAME_START");
+  //Serial.println("FRAME_START");
+  //Serial.write(frame, len);
+  //Serial.println("FRAME_END");
+
+  Serial.write(FRAME_HEADER, sizeof(FRAME_HEADER));
   Serial.write(frame, len);
-  Serial.println("FRAME_END");
+  Serial.write(FRAME_FOOTER, sizeof(FRAME_FOOTER));
   
   delay(10);
 }
