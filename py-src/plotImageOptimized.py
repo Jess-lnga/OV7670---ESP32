@@ -128,6 +128,9 @@ try:
                 b = (pixels & 0x1F) << 3
                 rgb = np.dstack((r, g, b)).astype(np.uint8)
 
+                # Rotation de -90°
+                rgb = np.rot90(rgb, k=-1)
+
                 img_display.set_data(rgb)
                 frame_data = bytearray()
 
