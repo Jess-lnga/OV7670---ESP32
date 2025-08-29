@@ -19,6 +19,9 @@
 #define WIDTH  160
 #define HEIGHT 120
 
+#define WEIGHT_WINDOW 10
+#define MIN_ERROR 10
+
 // Couleur bleue en RGB565 (carré autour de la balle)
 #define BLUE 0x001F 
 
@@ -26,7 +29,11 @@ bool isRed(uint16_t pixel);
 void drawRect(uint16_t* frame, int x0, int y0, int x1, int y1);
 
 void setupCam();
-void takeImage();
+void takeImage(bool detect);
+void detection();
 
 uint16_t* getFrame();
 size_t getLen();
+
+float get_h_offset();
+float get_v_offset();
