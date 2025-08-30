@@ -222,7 +222,8 @@ void cameraTask(void *pvParameters) {
     while (true) {
         takeImage(true);  // capture et traitement
         xSemaphoreGive(servoSemaphore); // signaler que les offsets sont prêts
-        vTaskDelayUntil(&xLastWakeTime, xFrequency); // fréquence fixe
+        vTaskDelay(pdMS_TO_TICKS(1));
+        //vTaskDelayUntil(&xLastWakeTime, xFrequency); // fréquence fixe
     }
 }
 
@@ -250,7 +251,7 @@ void setupCam(){
     xTaskCreatePinnedToCore(
         cameraTask,      // fonction
         "Camera Task",   // nom
-        4096,            // stack
+        8192,            // stack
         NULL,            // param
         2,               // priorité (plus haute que servos)
         &cameraTaskHandle,
