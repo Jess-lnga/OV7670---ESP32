@@ -86,14 +86,9 @@ void compute_mean_pos(){
     x_ball /= float(WEIGHT_WINDOW);
     y_ball /= float(WEIGHT_WINDOW);
     
-
-    vertical_offset   = float(WIDTH/2.0)  - x_ball;
-    horizontal_offset = float(HEIGHT/2.0) - y_ball ;
-
-    //if(vertical_offset < MIN_ERROR){vertical_offset = 0;}
-    //if(horizontal_offset < MIN_ERROR){horizontal_offset = 0;}
-
-
+    vertical_offset   =  float(HEIGHT/2.0) - y_ball ;
+    horizontal_offset =  float(WIDTH/2.0)  - x_ball;
+    
     //Serial.println("------------------------------");
     //Serial.println("Pos: ");
     //Serial.print("x = "); Serial.println(x_ball);

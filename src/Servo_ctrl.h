@@ -15,4 +15,9 @@
 #define FREQ 50       // 50 Hz for servos
 #define RESOLUTION 16 // 16 bits de résolution (0–65535)
 
+#define KP_H 1
+#define KP_V 1
+
+#define MIN_ERROR 5
+
 void setup_servos();

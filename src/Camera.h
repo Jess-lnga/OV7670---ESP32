@@ -23,7 +23,7 @@
 #define BLUE 0x001F
 
 #define WEIGHT_WINDOW 2
-#define MIN_ERROR 5
+
 /////////////////////////////////////////////////
 
 //bool isRed(uint16_t pixel);
