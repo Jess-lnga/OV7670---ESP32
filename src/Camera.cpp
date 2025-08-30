@@ -50,10 +50,7 @@ void drawRect(uint16_t* frame, int x0, int y0, int x1, int y1) {
     }
 }
 
-
-
-
-
+////////////////////////////////////////////
 uint16_t* getFrame(){
     return frame;
 }
@@ -73,6 +70,8 @@ float get_h_offset(){
 float get_v_offset(){
     return vertical_offset;
 }
+
+////////////////////////////////////////////
 
 void compute_mean_pos(){
     
@@ -217,14 +216,12 @@ void takeImage(bool detect){
 }
 
 void cameraTask(void *pvParameters) {
-    const TickType_t xFrequency = pdMS_TO_TICKS(80); // 80 ms
+    const TickType_t xFrequency = pdMS_TO_TICKS(CAM_FREQ); 
     TickType_t xLastWakeTime = xTaskGetTickCount();
 
     while (true) {
         takeImage(true);  // capture et traitement
         xSemaphoreGive(servoSemaphore); // signaler que les offsets sont prêts
-
-
         vTaskDelayUntil(&xLastWakeTime, xFrequency); // fréquence fixe
     }
 }

@@ -16,6 +16,7 @@
 #define PIN_D6 18
 #define PIN_D7 19
 
+#define CAM_FREQ 80  //ms
 #define WIDTH  160
 #define HEIGHT 120
 

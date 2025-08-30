@@ -3,18 +3,8 @@
 
 TaskHandle_t servoTaskHandle = NULL;
 
-const int servoPin1 = 15; //Vertical servo
-const int servoPin2 = 23; //Horizontal servo
-
 static float angle_h, angle_v;
 
-// Canaux PWM pour ESP32
-const int channel1 = 8; //Vertical servo
-const int channel2 = 9; //Horizontal servo
-
-// Fréquence et résolution PWM
-const int freq = 50;        // 50 Hz pour servos
-const int resolution = 16;  // 16 bits de résolution (0–65535)
 
 // Convertit un angle [0–180] en largeur d’impulsion (µs)
 int angleToUs(int angle) {
@@ -25,32 +15,27 @@ int angleToUs(int angle) {
 
 // Convertit largeur d’impulsion (µs) → valeur 16 bits PWM
 uint32_t usToDuty(int us) {
-    uint32_t dutyMax = (1 << resolution) - 1; // 65535
+    uint32_t dutyMax = (1 << RESOLUTION) - 1; // 65535
     return (uint32_t)((float)us / 20000.0 * dutyMax); // période = 20 ms
 }
 
 
-
 void set_v_angle(){
-    ledcWrite(channel1, usToDuty(angleToUs(angle_v)));
-    //delay(20);
+    ledcWrite(CHANNEL1, usToDuty(angleToUs(angle_v)));
 }
 
 void set_h_angle(){
-    ledcWrite(channel2, usToDuty(angleToUs(angle_h)));
-    //delay(20);
+    ledcWrite(CHANNEL2, usToDuty(angleToUs(angle_h)));
 }
 
 void set_v_angle(int angle){
     angle_v = angle;
-    ledcWrite(channel1, usToDuty(angleToUs(angle)));
-    //delay(20);
+    ledcWrite(CHANNEL1, usToDuty(angleToUs(angle)));
 }
 
 void set_h_angle(int angle){
     angle_h = angle;
-    ledcWrite(channel2, usToDuty(angleToUs(angle)));
-    //delay(20);
+    ledcWrite(CHANNEL2, usToDuty(angleToUs(angle)));
 }
 
 void update_angles(float h_offset, float v_offset){
@@ -90,15 +75,14 @@ void servoTask(void *pvParameters){
 
 void setup_servos(){
     // Config PWM
-    ledcSetup(channel1, freq, resolution);
-    ledcSetup(channel2, freq, resolution);
+    ledcSetup(CHANNEL1, FREQ, RESOLUTION);
+    ledcSetup(CHANNEL2, FREQ, RESOLUTION);
 
     // Associer pins
-    ledcAttachPin(servoPin1, channel1);
-    ledcAttachPin(servoPin2, channel2);
+    ledcAttachPin(SERVOPIN1, CHANNEL1);
+    ledcAttachPin(SERVOPIN2, CHANNEL2);
     
-    angle_h = 90; angle_v = 90;
-    set_h_angle(); set_v_angle();
+    set_h_angle(90); set_v_angle(90);
 
     xTaskCreatePinnedToCore(
         servoTask,
