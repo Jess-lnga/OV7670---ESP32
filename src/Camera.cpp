@@ -1,5 +1,8 @@
 #include "Camera.h"
 
+static SemaphoreHandle_t servoSemaphore = NULL;
+static TaskHandle_t cameraTaskHandle = NULL;
+
 static bool pxlIsRed[HEIGHT*WIDTH];
 
 static uint16_t* frame;
@@ -47,35 +50,9 @@ void drawRect(uint16_t* frame, int x0, int y0, int x1, int y1) {
     }
 }
 
-void setupCam(){
-    Serial.println("Initialisation de la caméra...");
 
-    I2SCamera::init(
-        WIDTH, HEIGHT,
-        PIN_VSYNC, PIN_HREF, PIN_XCLK,
-        PIN_PCLK,
-        PIN_D0, PIN_D1, PIN_D2, PIN_D3,
-        PIN_D4, PIN_D5, PIN_D6, PIN_D7
-    );
 
-    for(int i(0); i < WEIGHT_WINDOW; ++i){
-        mvg_avg_pos_x[i] = 0;
-        mvg_avg_pos_y[i] = 0;
-    }
 
-    x_ball = 0; y_ball = 0; r_ball = 0;
-    pos_in_mvg_avg_vector = 0;
-
-  Serial.println("Caméra prête !");
-}
-
-void takeImage(bool detect){
-    camera.oneFrame();
-    frame = (uint16_t*) I2SCamera::frame; // RGB565
-    len = I2SCamera::frameBytes; // nombre de pixels
-
-    if(detect){detection();}
-}
 
 uint16_t* getFrame(){
     return frame;
@@ -83,6 +60,10 @@ uint16_t* getFrame(){
 
 size_t getLen(){
     return len;
+}
+
+SemaphoreHandle_t getServoSemaphore(){
+    return servoSemaphore;
 }
 
 float get_h_offset(){
@@ -226,5 +207,61 @@ void detection()
                         int(x_ball + r_ball), int(y_ball + r_ball));
 
 }
+
+void takeImage(bool detect){
+    camera.oneFrame();
+    frame = (uint16_t*) I2SCamera::frame; // RGB565
+    len = I2SCamera::frameBytes; // nombre de pixels
+
+    if(detect){detection();}
+}
+
+void cameraTask(void *pvParameters) {
+    const TickType_t xFrequency = pdMS_TO_TICKS(80); // 80 ms
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+
+    while (true) {
+        takeImage(true);  // capture et traitement
+        xSemaphoreGive(servoSemaphore); // signaler que les offsets sont prêts
+
+
+        vTaskDelayUntil(&xLastWakeTime, xFrequency); // fréquence fixe
+    }
+}
+
+void setupCam(){
+    Serial.println("Initialisation de la caméra...");
+
+    I2SCamera::init(
+        WIDTH, HEIGHT,
+        PIN_VSYNC, PIN_HREF, PIN_XCLK,
+        PIN_PCLK,
+        PIN_D0, PIN_D1, PIN_D2, PIN_D3,
+        PIN_D4, PIN_D5, PIN_D6, PIN_D7
+    );
+
+    for(int i(0); i < WEIGHT_WINDOW; ++i){
+        mvg_avg_pos_x[i] = 0;
+        mvg_avg_pos_y[i] = 0;
+    }
+
+    x_ball = 0; y_ball = 0; r_ball = 0;
+    pos_in_mvg_avg_vector = 0;
+
+    servoSemaphore = xSemaphoreCreateBinary();
+
+    xTaskCreatePinnedToCore(
+        cameraTask,      // fonction
+        "Camera Task",   // nom
+        4096,            // stack
+        NULL,            // param
+        2,               // priorité (plus haute que servos)
+        &cameraTaskHandle,
+        0                // Core 0 (laisser WiFi tourner sur core 1)
+    );
+
+  Serial.println("Caméra prête !");
+}
+
 
 
