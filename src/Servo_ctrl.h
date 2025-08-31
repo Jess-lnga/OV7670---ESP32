@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#define MAX_SERVO_MVMNT 2
+#define MAX_SERVO_MVMNT 10
 #define ANGLE_MAX 180
 #define ANGLE_MIN 0
 
@@ -15,9 +15,9 @@
 #define FREQ 50       // 50 Hz for servos
 #define RESOLUTION 16 // 16 bits de résolution (0–65535)
 
-#define KP_H 1
-#define KP_V 1
+#define KP_H float(1.0/6.0)
+#define KP_V float(1.0/8.0)
 
-#define MIN_ERROR 5
+#define MIN_ERROR 2
 
 void setup_servos();

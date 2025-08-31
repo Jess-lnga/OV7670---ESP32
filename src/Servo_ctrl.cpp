@@ -39,15 +39,17 @@ void set_h_angle(int angle){
 }
 
 void update_angles(float h_offset, float v_offset){
-    //if(vertical_offset < MIN_ERROR){vertical_offset = 0;}
-    //if(horizontal_offset < MIN_ERROR){horizontal_offset = 0;}
+    if(fabs(v_offset) < MIN_ERROR){v_offset = 0;}
+    if(fabs(h_offset) < MIN_ERROR){h_offset = 0;}
     
+    h_offset *= KP_H;
     if(fabs(h_offset) > MAX_SERVO_MVMNT){
         angle_h += float(MAX_SERVO_MVMNT)*(fabs(h_offset)/h_offset);
     }else{
         angle_h += h_offset;
     }
 
+    v_offset *= KP_V;
     if(fabs(v_offset) > MAX_SERVO_MVMNT){
         angle_v -= float(MAX_SERVO_MVMNT)*(fabs(v_offset)/v_offset);
     }else{
@@ -73,6 +75,7 @@ void servoTask(void *pvParameters){
         if(xSemaphoreTake(getServoSemaphore(), portMAX_DELAY) == pdTRUE){
             update_angles(get_h_offset(), get_v_offset());
         }
+        vTaskDelay(pdMS_TO_TICKS(1));
     }
 }
 
